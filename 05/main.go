@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -39,8 +40,60 @@ func main() {
 	fmt.Printf("Running time: %v\n", end.Sub(start))
 }
 
+type Range struct {
+	start int
+	end   int
+}
+
+func getRange(s string) Range {
+	var r Range
+	fmt.Sscanf(s, "%d-%d", &r.start, &r.end)
+	return r
+}
+
+func getRanges(lines []string) []Range {
+	ranges := make([]Range, 0)
+	for _, line := range lines {
+		ranges = append(ranges, getRange(line))
+	}
+	return ranges
+}
+
+func getIngredient(s string) int {
+	i, _ := strconv.Atoi(s)
+	return i
+}
+
+func getIngredients(lines []string) []int {
+	ingredients := make([]int, 0)
+	for _, line := range lines {
+		ingredients = append(ingredients, getIngredient(line))
+	}
+	return ingredients
+}
+
+func isFresh(ranges []Range, ingredient int) bool {
+	for _, r := range ranges {
+		if ingredient >= r.start && ingredient <= r.end {
+			return true
+		}
+	}
+	return false
+}
+
 func run(input string) string {
-	return ""
+	parts := strings.Split(strings.TrimSpace(input), "\n\n")
+	lines := strings.Split(parts[0], "\n")
+	ranges := getRanges(lines)
+	ingredients := getIngredients(strings.Split(parts[1], "\n"))
+	count := 0
+	for _, ingredient := range ingredients {
+		if isFresh(ranges, ingredient) {
+			count++
+		}
+	}
+	fmt.Printf("Fresh count: %d\n", count)
+	return strconv.Itoa(count)
 }
 
 func run2(input string) string {
