@@ -117,12 +117,11 @@ func run(input string) string {
 	parts := strings.Split(strings.TrimSpace(input), "\n\n")
 	lines := strings.Split(parts[0], "\n")
 	ranges := getRanges(lines)
-	ranges2 := getRanges2(lines)
 	ingredients := getIngredients(strings.Split(parts[1], "\n"))
 	count := 0
 	for _, ingredient := range ingredients {
 		if isFresh(ranges, ingredient) {
-			if !isFresh(ranges2, ingredient) {
+			if !isFresh(ranges, ingredient) {
 				log.Fatalf("Mismatch for ingredient %d\n", ingredient)
 			}
 			count++
