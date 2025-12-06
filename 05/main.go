@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"chwojkofrank.com/interval"
 )
 
 func readInput(fname string) string {
@@ -40,21 +42,51 @@ func main() {
 	fmt.Printf("Running time: %v\n", end.Sub(start))
 }
 
-type Range struct {
-	start int
-	end   int
-}
-
-func getRange(s string) Range {
-	var r Range
-	fmt.Sscanf(s, "%d-%d", &r.start, &r.end)
+func getRange(s string) interval.Interval {
+	var r interval.Interval
+	fmt.Sscanf(s, "%d-%d", &r.Start, &r.End)
 	return r
 }
 
-func getRanges(lines []string) []Range {
-	ranges := make([]Range, 0)
+func addRange(ranges []interval.Interval, newRange interval.Interval) []interval.Interval {
+	// take the intersection of newRange with existing ranges
+	for _, r := range ranges {
+		if newRange.Intersects(r) {
+			minus := newRange.Minus(r)
+			// add the non-intersecting parts back to ranges
+			for _, xr := range minus {
+				ranges = addRange(ranges, xr)
+			}
+			return ranges
+		}
+	}
+	ranges = append(ranges, newRange)
+
+	return ranges
+}
+
+func getRanges(lines []string) []interval.Interval {
+	ranges := make([]interval.Interval, 0)
 	for _, line := range lines {
 		ranges = append(ranges, getRange(line))
+	}
+	// sort ranges by Start
+	// simple insertion sort since the number of ranges is small
+	for i := 1; i < len(ranges); i++ {
+		j := i
+		for j > 0 && ranges[j-1].Start > ranges[j].Start {
+			ranges[j-1], ranges[j] = ranges[j], ranges[j-1]
+			j--
+		}
+	}
+	return ranges
+}
+
+func getRanges2(lines []string) []interval.Interval {
+	ranges := make([]interval.Interval, 0)
+	for _, line := range lines {
+		r := getRange(line)
+		ranges = addRange(ranges, r)
 	}
 	return ranges
 }
@@ -72,9 +104,9 @@ func getIngredients(lines []string) []int {
 	return ingredients
 }
 
-func isFresh(ranges []Range, ingredient int) bool {
+func isFresh(ranges []interval.Interval, ingredient int) bool {
 	for _, r := range ranges {
-		if ingredient >= r.start && ingredient <= r.end {
+		if ingredient >= r.Start && ingredient <= r.End {
 			return true
 		}
 	}
@@ -85,10 +117,14 @@ func run(input string) string {
 	parts := strings.Split(strings.TrimSpace(input), "\n\n")
 	lines := strings.Split(parts[0], "\n")
 	ranges := getRanges(lines)
+	ranges2 := getRanges2(lines)
 	ingredients := getIngredients(strings.Split(parts[1], "\n"))
 	count := 0
 	for _, ingredient := range ingredients {
 		if isFresh(ranges, ingredient) {
+			if !isFresh(ranges2, ingredient) {
+				log.Fatalf("Mismatch for ingredient %d\n", ingredient)
+			}
 			count++
 		}
 	}
@@ -97,5 +133,14 @@ func run(input string) string {
 }
 
 func run2(input string) string {
-	return ""
+	parts := strings.Split(strings.TrimSpace(input), "\n\n")
+	lines := strings.Split(parts[0], "\n")
+	ranges := getRanges2(lines)
+	// count how many integers are in the ranges
+	count := 0
+	for _, r := range ranges {
+		count += r.End - r.Start + 1
+	}
+	fmt.Printf("Total fresh ingredients: %d\n", count)
+	return strconv.Itoa(count)
 }

@@ -21,6 +21,27 @@ func (a Interval) Intersection(b Interval) (Interval, error) {
 	return Interval{max(a.Start, b.Start), min(a.End, b.End)}, nil
 }
 
+// [1-2] - [3-4] = [1-2]
+// [1-4] - [2-3] = [1-1], [4-4]
+// [1-3] - [2-4] = [1-1]
+// [2-4] - [1-3] = [4-4]
+// [3-4] - [1-2] = [3-4]
+// [2-3] - [1-4] =
+func (a Interval) Minus(b Interval) []Interval {
+	var results []Interval
+	if a.End < b.Start || b.End < a.Start {
+		results = append(results, a)
+		return results
+	}
+	if a.Start < b.Start {
+		results = append(results, Interval{a.Start, b.Start - 1})
+	}
+	if b.End < a.End {
+		results = append(results, Interval{b.End + 1, a.End})
+	}
+	return results
+}
+
 func (a Interval) Union(b Interval) (Interval, error) {
 	if a.End < b.Start || b.End < a.Start {
 		return Interval{}, errors.New("no union")
