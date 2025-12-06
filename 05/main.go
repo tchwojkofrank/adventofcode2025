@@ -121,9 +121,6 @@ func run(input string) string {
 	count := 0
 	for _, ingredient := range ingredients {
 		if isFresh(ranges, ingredient) {
-			if !isFresh(ranges, ingredient) {
-				log.Fatalf("Mismatch for ingredient %d\n", ingredient)
-			}
 			count++
 		}
 	}
