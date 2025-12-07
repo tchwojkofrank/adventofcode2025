@@ -48,8 +48,6 @@ func split(lines []string, n int) (string, int) {
 			switch input[i] {
 			case 'S':
 				output[i] = '|'
-			default:
-				output[i] = '.'
 			}
 		}
 		return string(output), splitCount
@@ -88,15 +86,15 @@ func run(input string) string {
 	lines := strings.Split(input, "\n")
 	totalSplitterCount := 0
 	splitCount := 0
-	printLines(lines)
-	fmt.Printf("Splits: %d\n\n", totalSplitterCount)
+	// printLines(lines)
+	// fmt.Printf("Splits: %d\n\n", totalSplitterCount)
 	for i := 0; i < len(lines)-1; i += 2 {
 		lines[i+1], splitCount = split(lines, i)
 		totalSplitterCount += splitCount
-		printLines(lines)
-		fmt.Printf("Splits: %d\n\n", totalSplitterCount)
+		// printLines(lines)
+		// fmt.Printf("Splits: %d\n\n", totalSplitterCount)
 	}
-	fmt.Printf("Splitter count: %d\n", totalSplitterCount)
+	// fmt.Printf("Splitter count: %d\n", totalSplitterCount)
 	return fmt.Sprintf("%d", totalSplitterCount)
 }
 
@@ -137,6 +135,6 @@ func run2(input string) string {
 	pos := strings.Index(lines[0], "S")
 	cache := make(Cache)
 	pathCount := travel(lines, 2, pos, cache)
-	fmt.Printf("Travel count: %d\n", pathCount)
+	// fmt.Printf("Travel count: %d\n", pathCount)
 	return fmt.Sprintf("%d", pathCount)
 }
