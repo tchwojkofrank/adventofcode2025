@@ -11,7 +11,9 @@ I tried a brute force depth first search, and that was taking far too long O(2^n
 But since subtrees always have the same value, we can just keep a ledger to drastically reduce the size of the tree traversal.
 
 ## Performance
-```Result: 1602
+```
+Result: 1602
 Running time: 36.042µs
 Result 2: 135656430050438
-Running time: 370.833µs```
+Running time: 370.833µs
+```
